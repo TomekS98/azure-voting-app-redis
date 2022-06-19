@@ -18,35 +18,36 @@ pipeline {
             cd ..
             """)
          }
-         stage('Start test app'){
-            steps {
-               pwsh(script: """
-               ./scripts/test_container.ps1
+      }
+      stage('Start test app'){
+         steps {
+            pwsh(script: """
+            ./scripts/test_container.ps1
+            """)
+         }
+         post{
+            success {
+               echo "App started successfully"
+            }
+            failure {
+               echo "App failed to start"
+            }
+         }
+      }
+      stage('Run Tests'){
+         steps {
+            pwsh(script: """
+               pytest ./tests/test_sample.py
                """)
-            }
-            post{
-               success {
-                  echo "App started successfully"
-               }
-               failure {
-                  echo "App failed to start"
-               }
-            }
          }
-         stage('Run Tests'){
-            steps {
-               pwsh(script: """
-                  pytest ./tests/test_sample.py
-                  """)
-            }
+      }
+      stage('Stop test app'){
+         steps {
+            pwsh(script: """
+               docker-compose down
+            """)
          }
-         stage('Stop test app'){
-            steps {
-               pwsh(script: """
-                  docker-compose down
-               """)
-            }
-         }
+      }
       }
 
    }
