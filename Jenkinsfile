@@ -2,50 +2,47 @@ pipeline {
    agent any
 
    stages {
-      stage('Verify Branch'){
+      stage('Verify Branch') {
          steps {
             echo "$GIT_BRANCH"
          }
       }
-      stage('Test Docker'){
-         steps{
-         pwsh(script: 'docker images -a')
-         }
-      }
-      stage('Docker Build'){
-         steps{
-         pwsh(script: """
-            cd ./azure-vote
-            docker images -a
-            docker build -t jenkins-pipeline .
-            docker images -a
-            cd ..
+      stage('Docker Build') {
+         steps {
+            pwsh(script: 'docker images -a')
+            pwsh(script: """
+               cd azure-vote/
+               docker images -a
+               docker build -t jenkins-pipeline .
+               docker images -a
+               cd ..
             """)
          }
       }
-      stage('Start test app'){
+      stage('Start test app') {
          steps {
             pwsh(script: """
-            ./scripts/test_container.ps1
+               docker-compose up -d
+               ./scripts/test_container.ps1
             """)
          }
-         post{
+         post {
             success {
-               echo "App started successfully"
+               echo "App started successfully :)"
             }
             failure {
-               echo "App failed to start"
+               echo "App failed to start :("
             }
          }
       }
-      stage('Run Tests'){
+      stage('Run Tests') {
          steps {
             pwsh(script: """
                pytest ./tests/test_sample.py
-               """)
+            """)
          }
       }
-      stage('Stop test app'){
+      stage('Stop test app') {
          steps {
             pwsh(script: """
                docker-compose down
