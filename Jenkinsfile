@@ -9,8 +9,8 @@ pipeline {
       }
       stage('Docker Build') {
          steps {
-            pwsh 'Write-Output "test output"'
-            pwsh 'docker images -a'
+            bat 'powershell.exe Write-Output "test output"'
+            bat 'powershell.exe docker images -a'
          }
       }
       
